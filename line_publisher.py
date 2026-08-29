@@ -39,8 +39,10 @@ def save_backups(backups):
     with open(BACKUP_FILE, "w", encoding="utf-8") as f:
         json.dump(backups, f, ensure_ascii=False, indent=4)
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def home():
+    if request.method == 'POST':
+        return 'OK', 200
     return "FB Auto Publisher Bot is running!"
 
 @app.route("/callback", methods=['POST'])
@@ -91,7 +93,7 @@ def handle_message(event):
             reply_text = f"❌ 發布失敗，FB 回傳錯誤：{res_data}"
 
     except Exception as e:
-        reply_text = f"⚠️ 發生錯誤：str({e})"
+        reply_text = f"⚠️ 發生錯誤：{str(e)}"
 
     line_bot_api.reply_message(
         event.reply_token,
