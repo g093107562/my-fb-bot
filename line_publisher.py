@@ -45,16 +45,20 @@ def home():
         return 'OK', 200
     return "FB Auto Publisher Bot is running!"
 
-@app.route("/callback", methods=['POST'])
+@app.route("/callback", methods=['GET', 'POST'])
 def callback():
-    signature = request.headers['X-Line-Signature']
+    # 支援 LINE 驗證的 GET 請求
+    if request.method == 'GET':
+        return 'Hello from LINE Bot callback!', 200
+        
+    signature = request.headers.get('X-Line-Signature', '')
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
-    return 'OK'
+    return 'OK', 200
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
